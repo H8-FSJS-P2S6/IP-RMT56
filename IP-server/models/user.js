@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+const { hashPassword } = require("../helpers/bycriptjs");
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -70,6 +71,9 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "User",
     }
   );
-
+  User.beforeCreate(async (user) => {
+    const hashedPassword = hashPassword(user.password);
+    user.password = hashedPassword;
+  });
   return User;
 };

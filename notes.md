@@ -2,9 +2,91 @@ Server
 
 - npm init -y
 
-- npm install express cors pg sequelize dotenv bcryptjs jsonwebtoken
+- npm install express cors pg sequelize dotenv bcryptjs jsonwebtoken body-parser
 
 - npm install --save-dev nodemon sequelize-cli
+
+- touch app.js
+  <!-- app.js -->
+  require("dotenv").config();
+  const express = require("express");
+
+const app = express();
+
+const router = require("./routers");
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+app.use(router);
+
+module.exports = { app };
+
+- mkdir routers
+- touch routers/index.js
+  <!-- Script router > index.js -->
+  const express = require('express')
+  const Controller = require('../controllers/controller');
+  const authentication = require('../middlewares/authentication');
+  const { guardAdminStaffCreated } = require('../middlewares/guardAdminStaffCreated')
+  const { guardAdminOnly } = require('../middlewares/guardAdminOnly')
+  const router = express.Router()
+  const multer = require('multer')
+  const upload = multer({ storage: multer.memoryStorage() })
+
+router.get("/", (req, res) => res.json({ message: 'Hello World!' }));
+
+// for public
+router.get("/pub/products", Controller.getProductsPublic);
+router.get("/pub/products/:id", Controller.getProductsByIdPublic);
+
+// login
+router.post("/login", Controller.login);
+
+router.use(authentication)
+
+// add-user (admin only)
+router.post("/add-user", guardAdminOnly, Controller.addUser);
+
+router.get("/products", Controller.getProducts);
+router.post("/products", Controller.createProduct);
+router.get("/products/:id", Controller.getProductsById);
+
+// need guardAdminStaffCreated
+router.put("/products/:id", guardAdminStaffCreated, Controller.updateProductById);
+router.delete("/products/:id", guardAdminStaffCreated, Controller.deleteProductById);
+
+router.get("/categories", Controller.getCategories);
+router.post("/categories", Controller.createCategory);
+router.put("/categories/:id", guardAdminStaffCreated, Controller.updateCategoryById);
+router.patch("/products/:id/imgUrl", guardAdminStaffCreated, upload.single("avatar"), Controller.updateProductImageById);
+
+function errorHandler(err, req, res, next) {
+console.log("🚀 ~ errorHandler ~ err:", err)
+switch (err.name) {
+case 'SequelizeValidationError':
+case 'SequelizeUniqueConstraintError':
+return res.status(400).json({ message: err.errors[0].message })
+case 'CustomValidation':
+return res.status(400).json({ message: err.message })
+case 'BadRequest':
+return res.status(400).json({ message: err.message })
+case 'Unauthorized':
+return res.status(401).json({ message: err.message ?? 'Invalid token' })
+case 'JsonWebTokenError':
+return res.status(401).json({ message: 'Invalid token' })
+case 'Forbidden':
+return res.status(403).json({ message: 'You are not Authorized' })
+case 'Not Found':
+return res.status(404).json({ message: err.message })
+default:
+res.status(500).json({ message: 'Internal Server Error' })
+}
+}
+
+router.use(errorHandler)
+
+module.exports = router
 
 - touch .gitignore .env .env_example -> node_modules .env
 
@@ -102,6 +184,89 @@ Tambahkan association di model
 - mkdir helpers middlewares
 - touch helpers/bycriptjs.js helpers/jwt.js middlewares/authentication.js
 
+<!-- hooks beforeCreate in User Model -->
+
+"use strict";
+const { Model } = require("sequelize");
+const { hashPassword } = require("../helpers/bycriptjs");
+
+module.exports = (sequelize, DataTypes) => {
+class User extends Model {
+/\*\*
+_ Helper method for defining associations.
+_ This method is not a part of Sequelize lifecycle.
+_ The `models/index` file will call this method automatically.
+_/
+static associate(models) {
+// Example of a one-to-many relationship with Cart
+// A User can have multiple Cart items
+User.hasMany(models.Cart, {
+foreignKey: "UserId",
+as: "carts",
+});
+
+      // Example of a one-to-many relationship with Order
+      // A User can have multiple Orders
+      User.hasMany(models.Order, {
+        foreignKey: "UserId",
+        as: "orders",
+      });
+    }
+
+}
+
+User.init(
+{
+email: {
+type: DataTypes.STRING,
+allowNull: false,
+unique: true, // Ensure email is unique
+validate: {
+isEmail: {
+msg: "Invalid email format",
+},
+},
+},
+password: {
+type: DataTypes.STRING,
+allowNull: false, // Password is required
+validate: {
+len: {
+args: [6], // Password must be at least 6 characters long
+msg: "Password must be at least 6 characters long",
+},
+},
+},
+name: {
+type: DataTypes.STRING,
+},
+role: {
+type: DataTypes.STRING,
+defaultValue: "Customer", // Default role is 'Customer'
+},
+phoneNumber: {
+type: DataTypes.STRING,
+},
+address: {
+type: DataTypes.STRING,
+},
+gender: {
+type: DataTypes.ENUM("male", "female"), // Gender field as enum
+allowNull: true, // Allow null if you don't want to enforce gender
+},
+},
+{
+sequelize,
+modelName: "User",
+}
+);
+User.beforeCreate(async (user) => {
+const hashedPassword = hashPassword(user.password);
+user.password = hashedPassword;
+});
+return User;
+};
+
 <!-- Script In bycript.js: -->
 
 const bcrypt = require('bcryptjs')
@@ -163,3 +328,8 @@ return next({ name: 'Unauthorized', message: 'Token has expired' });
 next(error);
 }
 }
+
+<!-- Controllers -->
+
+mkdir controllers
+touch controllers/controller.js
