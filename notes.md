@@ -65,4 +65,101 @@ console.log(`Example app listening on port ${port}`);
 
 - npx sequelize db:create
 
-- npx sequelize model:generate --name User --attributes username:string,email:string,password:string,role:string
+<!-- Create All Tables -->
+
+- npx sequelize model:generate --name User --attributes email:string,password:string,name:string,role:string,phoneNumber:string,address:string,gender:string
+
+- npx sequelize model:generate --name Cart --attributes UserId:integer,ProductId:integer,quantity:integer
+
+- npx sequelize model:generate --name Order --attributes UserId:integer,totalPrice:float,orderStatus:string,paymentStatus:string,paymentId:string
+
+- npx sequelize model:generate --name OrderCart --attributes OrderId:integer,ProductId:integer,quantity:integer,price:float
+
+- npx sequelize model:generate --name Product --attributes name:string,description:string,price:float,stock:integer,imgUrl:string,CategoryId:integer
+
+- npx sequelize model:generate --name Category --attributes name:string
+
+- npx sequelize model:generate --name FAQ --attributes question:string,answer:string
+
+<!-- Add FK, association, and validation -->
+
+Tambahkan constraint unique, isEmail, notNull ke migration User.email
+Tambahkan foreignKey di migration table Grocery
+Tambahkan association di model
+
+<!-- Migrate columns -->
+
+- npx sequelize db:migrate
+
+<!-- Create seeding -->
+
+- npx sequelize seed:generate --name demo-faqs
+- npx sequelize seed:generate --name demo-products
+- npx sequelize seed:generate --name demo-users
+
+<!-- In seeding User, create helpers for hashPassword -->
+
+- mkdir helpers middlewares
+- touch helpers/bycriptjs.js helpers/jwt.js middlewares/authentication.js
+
+<!-- Script In bycript.js: -->
+
+const bcrypt = require('bcryptjs')
+
+const hashPassword = (password) => {
+return bcrypt.hashSync(password)
+}
+
+const comparePassword = (password, hashedPassword) => {
+return bcrypt.compareSync(password, hashedPassword)
+}
+
+module.exports = { hashPassword, comparePassword}
+
+<!-- Script in jwt.js -->
+
+var jwt = require('jsonwebtoken');
+
+const secretKey = process.env.JWT_SECRET_KEY
+
+function signToken(data) {
+return jwt.sign(data, secretKey);
+}
+function verifyToken(data) {
+return jwt.verify(data, secretKey);
+}
+
+module.exports = {signToken, verifyToken}
+
+<!-- Script in middlewares/authentication.js -->
+
+const {User} = require('../models')
+const {verifyToken} = require('../helpers/jwt')
+
+module.exports = async function authenthication(req, res, next){
+const bearerToken = req.headers.authorization
+if (!bearerToken) {
+next({name: 'Unauthorized', message: 'Token is required'})
+return
+}
+const [, token] = bearerToken.split(' ')
+if (!token) {
+next({name: 'Unauthorized', message: 'Invalid token format'})
+return
+}
+try {
+const data = verifyToken(token)
+const user = await User.findByPk(data.id)
+if(!user) {
+next({name: 'Unauthorized', message: 'User not found'})
+return
+}
+req.user = user
+next()
+} catch (error) {
+if (error.name === 'TokenExpiredError') {
+return next({ name: 'Unauthorized', message: 'Token has expired' });
+}
+next(error);
+}
+}
