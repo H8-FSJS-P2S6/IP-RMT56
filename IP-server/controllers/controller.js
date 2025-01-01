@@ -1,6 +1,8 @@
+const { where } = require("sequelize");
 const { comparePassword } = require("../helpers/bycriptjs");
 const { signToken } = require("../helpers/jwt");
 const { Product, Category, User, Order, Cart, FAQ } = require("../models");
+const { Op } = require("sequelize");
 
 module.exports = class Controller {
   static async getProducts(req, res, next) {
@@ -8,15 +10,27 @@ module.exports = class Controller {
       const {
         page = 1,
         limit = 10,
-        sortOrder = "desc",
+        sort = "desc",
         category = "",
+        q = "",
       } = req.query;
       const pageNumber = parseInt(page, 10);
       const pageLimit = parseInt(limit, 10);
       const offset = (pageNumber - 1) * limit;
-      const order =
-        sortOrder === "asc" ? [["createdAt", "ASC"]] : [["createdAt", "DESC"]];
-      const categoryFilter = category ? { "$Category.name$": category } : {}; // This is important because Sequelize allows you to reference nested model fields using the $Model.field$ syntax
+      // Define the sorting logic
+      const order = [
+        ["createdAt", sort.toUpperCase() === "ASC" ? "ASC" : "DESC"],
+      ];
+      const productFilter = q
+        ? { name: { [Op.iLike]: `%${q}%` } } // Sequelize case-insensitive LIKE query
+        : {};
+      const categoryFilter = category ? { "$Category.id$": category } : {}; // This is important because Sequelize allows you to reference nested model fields using the $Model.field$ syntax
+
+      // Combine filters
+      const whereCondition = {
+        ...productFilter,
+        ...categoryFilter,
+      };
       const products = await Product.findAll({
         include: [
           {
@@ -24,7 +38,7 @@ module.exports = class Controller {
             attributes: ["name"],
           },
         ],
-        where: categoryFilter,
+        where: whereCondition,
         order,
         limit: pageLimit,
         offset,
@@ -37,6 +51,7 @@ module.exports = class Controller {
             where: categoryFilter, // Make sure we filter by Category name as well
           },
         ],
+        where: productFilter,
       });
       res.status(200).json({
         data: products,
@@ -196,13 +211,30 @@ module.exports = class Controller {
 
   static async addToCart(req, res, next) {
     try {
-      const { ProductId, quantity } = req.body;
-      const cartItem = await Cart.create({
-        UserId: req.user.id,
-        ProductId,
-        quantity,
+      const quantity = 1;
+      const { id } = req.params;
+      // Check if the product is already in the user's cart
+      const existingCartItem = await Cart.findOne({
+        where: {
+          UserId: req.user.id,
+          ProductId: id,
+        },
       });
-      res.status(201).json(cartItem);
+
+      if (existingCartItem) {
+        // If product is already in cart, increase quantity by 1
+        existingCartItem.quantity += 1;
+        await existingCartItem.save(); // Save the updated cart item
+        return res.status(200).json(existingCartItem);
+      } else {
+        // If not, create a new cart item
+        const newCartItem = await Cart.create({
+          UserId: req.user.id,
+          ProductId: id,
+          quantity: quantity,
+        });
+        return res.status(201).json(newCartItem);
+      }
     } catch (error) {
       next(error);
     }

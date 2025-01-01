@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router";
-export default function Card({ product }) {
+export default function Card({ product, onAdd }) {
   const navigate = useNavigate();
   return (
     <div
@@ -62,9 +62,19 @@ export default function Card({ product }) {
             alignSelf: "center", // Centers the button horizontally
             padding: "5px 10px", // Adjusts the button padding for better spacing
           }}
-          onClick={() => navigate(`/pub/products/${product.id}`)}
+          onClick={() => navigate(`/products/${product.id}`)}
         >
           See Detail
+        </button>
+        <button
+          className="btn btn-primary"
+          style={{
+            alignSelf: "center", // Centers the button horizontally
+            padding: "5px 10px", // Adjusts the button padding for better spacing
+          }}
+          onClick={onAdd}
+        >
+          Add to Cart
         </button>
       </div>
     </div>

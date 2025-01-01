@@ -50,11 +50,12 @@ module.exports = {
     });
 
     let products = require("../data/product.json");
-    products = products.map((el) => {
+    products = products.map((el, i) => {
+      const currentTimeDelayed = new Date(new Date().getTime() + i * 1000);
       return {
         ...el,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: currentTimeDelayed,
+        updatedAt: currentTimeDelayed,
       };
     });
     await queryInterface.bulkInsert("Users", hashedData);

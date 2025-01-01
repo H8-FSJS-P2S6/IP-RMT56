@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { baseURLApi } from "../../helpers/http-client";
+import { baseURLApi } from "../helpers/http-client";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
-import "../../assets/styles/global.css";
+import "../assets/styles/global.css";
 
 export default function DetailProductPage() {
   const navigate = useNavigate();
-  const { productId } = useParams();
+  const { id } = useParams();
   const [product, setProduct] = useState({});
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await baseURLApi.get(`/products/${productId}`);
-        setProduct(data.data);
+        const { data } = await baseURLApi.get(`/products/${id}`);
+        setProduct(data);
       } catch (err) {
         console.log("🚀 ~ fetchCategories ~ err:", err);
         toast.error(`Failed to fetch Products`);
@@ -21,7 +21,7 @@ export default function DetailProductPage() {
     };
 
     fetchProduct();
-  }, [productId]);
+  }, [id]);
 
   const DescriptionWithReadMore = ({ description }) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -65,37 +65,6 @@ export default function DetailProductPage() {
         className="col-md-9 ms-sm-auto col-lg-10 px-md-4"
         id="detail-product-section"
       >
-        <button
-          data-variant="subtle"
-          data-size="xl"
-          type="button"
-          aria-label="Button Back"
-          style={{
-            position: "absolute",
-            top: "1%",
-            left: "1%",
-          }}
-          onClick={() => navigate("/pub/products")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="tabler-icon tabler-icon-arrow-left"
-            style={{ width: "70%", height: "70%" }}
-          >
-            <path d="M5 12l14 0" />
-            <path d="M5 12l6 6" />
-            <path d="M5 12l6 -6" />
-          </svg>{" "}
-          Back
-        </button>
         <div className="row">
           <div className="col-12 col-md-12"></div>
           <h3
@@ -122,6 +91,9 @@ export default function DetailProductPage() {
               height: "300px",
               width: "auto",
               marginBottom: "20px",
+              display: "block", // Ensures that the image behaves like a block element
+              marginLeft: "auto", // Automatically calculate left margin to center
+              marginRight: "auto", // Automatically calculate right margin to center
             }}
             alt={product.name}
           />
@@ -141,8 +113,7 @@ export default function DetailProductPage() {
                 Price: Rp
                 {product.price ? product.price.toLocaleString() : "N/A"}
               </span>{" "}
-              || <span>Stock: {product.stock}</span> ||{" "}
-              <span>Added by: {product.User?.email}</span>{" "}
+              || <span>Stock: {product.stock}</span>
             </div>
             <div
               style={{

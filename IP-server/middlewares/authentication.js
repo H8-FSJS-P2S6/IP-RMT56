@@ -4,20 +4,17 @@ const { verifyToken } = require("../helpers/jwt");
 module.exports = async function authenthication(req, res, next) {
   const bearerToken = req.headers.authorization;
   if (!bearerToken) {
-    next({ name: "Unauthorized", message: "Token is required" });
-    return;
+    return next({ name: "Unauthorized", message: "Token is required" });
   }
   const [, token] = bearerToken.split(" ");
   if (!token) {
-    next({ name: "Unauthorized", message: "Invalid token format" });
-    return;
+    return next({ name: "Unauthorized", message: "Invalid token format" });
   }
   try {
     const data = verifyToken(token);
     const user = await User.findByPk(data.id);
     if (!user) {
-      next({ name: "Unauthorized", message: "User not found" });
-      return;
+      return next({ name: "Unauthorized", message: "User not found" });
     }
     req.user = user;
     next();

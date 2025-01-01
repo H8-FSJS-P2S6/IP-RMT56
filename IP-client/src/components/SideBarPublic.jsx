@@ -19,7 +19,7 @@ export default function SideBarPublic() {
       <div className="position-sticky pt-3">
         {/* Logo Section */}
         <div style={{ marginLeft: "20px", marginBottom: "20px" }}>
-          <a href="/pub/products" className="d-block">
+          <a href="/products" className="d-block">
             <img
               src={uniqloLogo}
               alt="UNIKLOH_logo"

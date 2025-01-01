@@ -18,7 +18,7 @@ export default function SideBar() {
     >
       <div className="position-sticky pt-3">
         {/* Logo Section */}
-        <div style={{ marginLeft: "20px", marginBottom: "20px" }}>
+        <div style={{ marginBottom: "20px" }}>
           <a href="/products" className="d-block">
             <img
               src={uniqloLogo}
@@ -31,7 +31,6 @@ export default function SideBar() {
             />
           </a>
         </div>
-        <h6 style={{ marginLeft: "20px" }}>Admin Panel</h6>
         <ul className="nav flex-column">
           <li className="nav-item">
             <NavLink
@@ -43,79 +42,25 @@ export default function SideBar() {
               <span className="icon material-symbols-outlined me-2">
                 shopping_bag
               </span>
-              Products
+              Back To Home
             </NavLink>
           </li>
-          {/* Conditional Rendering for "Add User" */}
-          {/* {user.role.toLowerCase() === "admin" && (
-            <li className="nav-item">
-              <NavLink
-                to="/admin/add-user"
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? "active" : ""}`
-                }
-              >
-                <span className="icon material-symbols-outlined me-2">
-                  account_circle
-                </span>
-                Add User
-              </NavLink>
-            </li>
-          )} */}
           <li className="nav-item">
             <NavLink
-              to="/admin/add-user"
+              to="/cart"
               className={({ isActive }) =>
                 `nav-link ${isActive ? "active" : ""}`
               }
             >
               <span className="icon material-symbols-outlined me-2">
-                account_circle
+                shopping_bag
               </span>
-              Add User
-            </NavLink>
-          </li>
-
-          <li className="nav-item">
-            <NavLink
-              to="/categories"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              <span className="icon material-symbols-outlined me-2">
-                category
-              </span>
-              Categories{" "}
+              My Shopping Cart
             </NavLink>
           </li>
         </ul>
-        <h6 className="sidebar-heading d-flex justify-content-left align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-          <span>Account</span>
-        </h6>
+        <h6 className="sidebar-heading d-flex justify-content-left align-items-center px-3 mt-4 mb-1 text-muted text-uppercase"></h6>
         <ul className="nav flex-column mb-2">
-          {/* <li className="nav-item">
-            <a className="nav-link">
-              {" "}
-              <span className="icon material-symbols-outlined me-2">
-                person
-              </span>
-              Welcome Back <span id="username"></span>
-            </a>
-          </li> */}
-          <li className="nav-item">
-            <NavLink
-              to="/pub/products"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              <span className="icon material-symbols-outlined me-2">
-                public
-              </span>
-              View Public Site{" "}
-            </NavLink>
-          </li>
           <li className="nav-item">
             <a
               onClick={handleLogout}

@@ -14,9 +14,8 @@ import RegisterPage from "./pages/RegisterPage";
 import RootLayout from "./layouts/RootLayout";
 import HomePage from "./pages/HomePage";
 import "bootstrap/dist/css/bootstrap.min.css";
-import MyCoinsPage from "./pages/MyCoinsPage";
-import MyCoinUpdatePage from "./pages/MyCoinUpdatePage";
 import DetailProductPage from "./pages/DetailProductPage";
+import CartPage from "./pages/CartPage";
 
 function ProtectedRoutes({ children }) {
   const isAuthenticated = useAuth();
@@ -63,6 +62,7 @@ function App() {
             {/* below routes are protected */}
             <Route path="/products" element={<HomePage />} />
             <Route path="/products/:id" element={<DetailProductPage />} />
+            <Route path="/cart" element={<CartPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

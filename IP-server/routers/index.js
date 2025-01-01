@@ -26,6 +26,12 @@ router.get("/pub/faqs", Controller.getFAQsPublic);
 // AUTHENTICATION (need log in to make transactions)
 router.use(authentication);
 
+// CARTS
+router.get("/cart", Controller.getCart); // Get cart items
+router.post("/cart/:id", Controller.addToCart); // Add item to cart
+router.put("/cart/:id", Controller.updateCart); // Update item in cart
+router.delete("/cart/:id", Controller.deleteCartItem); // Delete item from cart
+
 // FAQs logged-in
 router.get("/faqs", Controller.getFAQsLogIn);
 
@@ -33,11 +39,6 @@ router.get("/faqs", Controller.getFAQsLogIn);
 router.get("/orders", Controller.getOrders); // Fetch user orders
 router.get("/orders/:id", Controller.getOrderDetails); // Fetch specific order details
 router.post("/orders", Controller.createOrder); // Create a new order
-
-router.get("/cart", Controller.getCart); // Get cart items
-router.post("/cart", Controller.addToCart); // Add item to cart
-router.put("/cart/:id", Controller.updateCart); // Update item in cart
-router.delete("/cart/:id", Controller.deleteCartItem); // Delete item from cart
 
 function errorHandler(err, req, res, next) {
   console.log("🚀 ~ errorHandler ~ err:", err);
