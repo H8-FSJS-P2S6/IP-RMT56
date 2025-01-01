@@ -12,13 +12,11 @@ module.exports = (sequelize) => {
       // Order belongs to User
       Order.belongsTo(models.User, {
         foreignKey: "UserId",
-        as: "user", // Alias for the association
       });
 
       // Order has many OrderCart entries (products in the order)
       Order.hasMany(models.OrderCart, {
         foreignKey: "OrderId",
-        as: "orderItems", // Alias for the association
       });
     }
   }

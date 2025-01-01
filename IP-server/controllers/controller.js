@@ -72,7 +72,7 @@ module.exports = class Controller {
         return;
       }
 
-      res.status(200).json(response);
+      res.status(200).json(product);
     } catch (error) {
       next(error);
     }

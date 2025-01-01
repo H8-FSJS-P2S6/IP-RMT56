@@ -12,13 +12,11 @@ module.exports = (sequelize, DataTypes) => {
       // OrderCart belongs to Order
       OrderCart.belongsTo(models.Order, {
         foreignKey: "OrderId", // The column in OrderCart that references the Order
-        as: "order", // Alias for the association
       });
 
       // OrderCart belongs to Product
       OrderCart.belongsTo(models.Product, {
         foreignKey: "ProductId", // The column in OrderCart that references the Product
-        as: "product", // Alias for the association
       });
     }
   }

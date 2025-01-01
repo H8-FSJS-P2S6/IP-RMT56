@@ -14,14 +14,12 @@ module.exports = (sequelize, DataTypes) => {
       // A User can have multiple Cart items
       User.hasMany(models.Cart, {
         foreignKey: "UserId",
-        as: "carts",
       });
 
       // Example of a one-to-many relationship with Order
       // A User can have multiple Orders
       User.hasMany(models.Order, {
         foreignKey: "UserId",
-        as: "orders",
       });
     }
   }

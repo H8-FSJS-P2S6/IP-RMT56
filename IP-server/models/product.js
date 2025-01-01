@@ -12,7 +12,6 @@ module.exports = (sequelize, DataTypes) => {
       // Product belongs to Category
       Product.belongsTo(models.Category, {
         foreignKey: "CategoryId", // The column in Product that references Category
-        as: "category", // Alias for the association
       });
     }
   }

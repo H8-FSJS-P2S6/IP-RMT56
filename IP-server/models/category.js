@@ -12,7 +12,6 @@ module.exports = (sequelize, DataTypes) => {
       // Category has many Products
       Category.hasMany(models.Product, {
         foreignKey: "CategoryId", // The column in Product that references Category
-        as: "products", // Alias for the association
       });
     }
   }

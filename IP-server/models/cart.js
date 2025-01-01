@@ -12,13 +12,11 @@ module.exports = (sequelize, DataTypes) => {
       // Cart belongs to a User
       Cart.belongsTo(models.User, {
         foreignKey: "UserId",
-        as: "user", // Alias for the association
       });
 
       // Cart belongs to a Product
       Cart.belongsTo(models.Product, {
         foreignKey: "ProductId",
-        as: "product", // Alias for the association
       });
     }
   }
