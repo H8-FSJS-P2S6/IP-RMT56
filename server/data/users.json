@@ -11,6 +11,6 @@
         "email": "boo@mail.com",
         "password": "test123",
         "phone": "088123456789",
-        "role": "admin"
+        "role": "staff"
     }
 ]
