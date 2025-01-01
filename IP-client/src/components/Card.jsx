@@ -56,26 +56,33 @@ export default function Card({ product, onAdd }) {
           })}
         </h6>
 
-        <button
-          className="btn btn-primary"
+        <div
           style={{
-            alignSelf: "center", // Centers the button horizontally
-            padding: "5px 10px", // Adjusts the button padding for better spacing
+            display: "flex",
+            justifyContent: "center", // Centers the buttons horizontally
+            alignItems: "center", // Centers the buttons vertically
+            gap: "10px", // Adds space between the buttons
           }}
-          onClick={() => navigate(`/products/${product.id}`)}
         >
-          See Detail
-        </button>
-        <button
-          className="btn btn-primary"
-          style={{
-            alignSelf: "center", // Centers the button horizontally
-            padding: "5px 10px", // Adjusts the button padding for better spacing
-          }}
-          onClick={onAdd}
-        >
-          Add to Cart
-        </button>
+          <button
+            className="btn btn-primary"
+            style={{
+              padding: "5px 10px", // Adjusts the button padding for better spacing
+            }}
+            onClick={() => navigate(`/products/${product.id}`)}
+          >
+            Detail
+          </button>
+          <button
+            className="btn btn-primary"
+            style={{
+              padding: "5px 10px", // Adjusts the button padding for better spacing
+            }}
+            onClick={onAdd}
+          >
+            Add to Cart
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -242,16 +242,29 @@ module.exports = class Controller {
 
   static async updateCart(req, res, next) {
     try {
-      const { id } = req.params;
-      const { quantity } = req.body;
+      const { id } = req.params; // Cart ID
+      const { quantity } = req.body; // New quantity
+      const UserId = req.user.id; // User ID from middleware
+
+      if (!quantity || quantity <= 0) {
+        return res.status(400).json({ message: "Invalid quantity" });
+      }
+
       const cartItem = await Cart.findOne({
-        where: { id, UserId: req.user.id },
+        where: { ProductId: id, UserId },
+        include: { model: Product, attributes: ["stock"] },
       });
-      if (!cartItem)
-        throw { name: "Not Found", message: "Cart item not found" };
+
+      if (!cartItem) {
+        return res.status(404).json({ message: "Cart item not found" });
+      }
+
+      if (quantity > cartItem.Product.stock) {
+        return res.status(400).json({ message: "Stock not sufficient" });
+      }
 
       cartItem.quantity = quantity;
-      await cartItem.save();
+      await cartItem.save(); // Save the updated cart item
       res.status(200).json(cartItem);
     } catch (error) {
       next(error);
@@ -260,14 +273,15 @@ module.exports = class Controller {
 
   static async deleteCartItem(req, res, next) {
     try {
-      const { id } = req.params;
-      const cartItem = await Cart.findOne({
-        where: { id, UserId: req.user.id },
-      });
-      if (!cartItem)
-        throw { name: "Not Found", message: "Cart item not found" };
+      const { id } = req.params; // Cart ID
+      const UserId = req.user.id; // User ID from middleware
 
-      await cartItem.destroy();
+      const cartItem = await Cart.findOne({ where: { id, UserId } });
+      if (!cartItem) {
+        return res.status(404).json({ message: "Cart item not found" });
+      }
+
+      await cartItem.destroy(); // Remove the cart item
       res.status(200).json({ message: "Cart item deleted successfully" });
     } catch (error) {
       next(error);
