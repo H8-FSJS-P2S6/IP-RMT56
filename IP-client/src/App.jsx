@@ -1,35 +1,73 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router";
+import useAuth from "./helpers/useAuth";
+import { toast, ToastContainer } from "react-toastify";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import RootLayout from "./layouts/RootLayout";
+import HomePage from "./pages/HomePage";
+import "bootstrap/dist/css/bootstrap.min.css";
+import MyCoinsPage from "./pages/MyCoinsPage";
+import MyCoinUpdatePage from "./pages/MyCoinUpdatePage";
+import DetailProductPage from "./pages/DetailProductPage";
 
-function App() {
-  const [count, setCount] = useState(0)
+function ProtectedRoutes({ children }) {
+  const isAuthenticated = useAuth();
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
 }
 
-export default App
+function LoginWrapper() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const access_token = localStorage.getItem("access_token");
+    if (access_token) {
+      navigate("/", { state: { showToast: true } });
+    }
+  }, [navigate]);
+
+  return <LoginPage />;
+}
+
+function App() {
+  return (
+    <>
+      <ToastContainer />
+      <BrowserRouter>
+        <Routes>
+          {/* Public: Register and Login */}
+          <Route path="/login" element={<LoginWrapper />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          {/* Protected Routes */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoutes>
+                <RootLayout />
+              </ProtectedRoutes>
+            }
+          >
+            {/* below routes are protected */}
+            <Route path="/products" element={<HomePage />} />
+            <Route path="/products/:id" element={<DetailProductPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
+}
+
+export default App;

@@ -333,3 +333,9 @@ next(error);
 
 mkdir controllers
 touch controllers/controller.js
+
+<!-- Test endpoints -->
+
+npm install --save-dev jest supertest
+mkdir **tests**
+touch **tests**/test.js

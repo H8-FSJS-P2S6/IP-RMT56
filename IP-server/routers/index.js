@@ -31,6 +31,7 @@ router.get("/faqs", Controller.getFAQsLogIn);
 
 // User-specific orders and cart management
 router.get("/orders", Controller.getOrders); // Fetch user orders
+router.get("/orders/:id", Controller.getOrderDetails); // Fetch specific order details
 router.post("/orders", Controller.createOrder); // Create a new order
 
 router.get("/cart", Controller.getCart); // Get cart items

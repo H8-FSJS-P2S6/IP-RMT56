@@ -241,4 +241,32 @@ module.exports = class Controller {
       next(error);
     }
   }
+
+  static async getOrderDetails(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      // Fetch the specific order by ID
+      const order = await Order.findOne({
+        where: { id },
+        include: [
+          {
+            model: Product,
+            attributes: ["name", "price"], // Include the products in the order
+          },
+        ],
+      });
+
+      if (!order) {
+        return res.status(404).json({ message: "Order not found." });
+      }
+
+      // Return specific order details
+      res.status(200).json({
+        data: order,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 };
