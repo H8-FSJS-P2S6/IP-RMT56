@@ -1,6 +1,6 @@
 const { OAuth2Client } = require("google-auth-library");
-const { comparePass } = require("../helper/bcrypt");
-const { signToken } = require("../helper/jwt");
+const { comparePass } = require("../helpers/bcrypt");
+const { signToken } = require("../helpers/jwt");
 const { User } = require("../models");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
