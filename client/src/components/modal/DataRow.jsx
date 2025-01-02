@@ -5,7 +5,6 @@ const DataRow = ({ catergory, value, max }) => {
         <tr>
             <td className='category'>{ catergory }</td>
             <td className="stats-number">{ value }</td>
-            
             {
                 max &&
                 <td className="range-slide">
