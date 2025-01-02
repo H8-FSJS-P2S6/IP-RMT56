@@ -1,9 +1,17 @@
 const { where } = require("sequelize");
 const { comparePassword } = require("../helpers/bycriptjs");
 const { signToken } = require("../helpers/jwt");
-const { Product, Category, User, Order, Cart, FAQ } = require("../models");
+const {
+  Product,
+  Category,
+  User,
+  Order,
+  Cart,
+  OrderCart,
+  FAQ,
+} = require("../models");
 const { Op } = require("sequelize");
-
+const midtransClient = require("midtrans-client");
 module.exports = class Controller {
   static async getProducts(req, res, next) {
     try {
@@ -174,7 +182,12 @@ module.exports = class Controller {
     try {
       const orders = await Order.findAll({
         where: { UserId: req.user.id },
-        include: [Product],
+        include: [
+          {
+            model: OrderCart,
+            include: [Product], // This will fetch the related products for each order
+          },
+        ],
       });
       res.status(200).json(orders);
     } catch (error) {
@@ -184,14 +197,52 @@ module.exports = class Controller {
 
   static async createOrder(req, res, next) {
     try {
-      const { ProductId, quantity } = req.body;
-      const order = await Order.create({
-        UserId: req.user.id,
-        ProductId,
-        quantity,
+      console.log("🚀 ~ Controller ~ createOrder ~ req.user.id:", req.user.id);
+      console.log("🚀 ~ Controller ~ createOrder ~ req.body:", req.body);
+      const {
+        order_id,
+        transaction_id,
+        gross_amount,
+        payment_type,
+        transaction_status,
+        transaction_time,
+      } = req.body.transactionDetails;
+
+      const UserId = req.user.id;
+
+      const cartItems = await Cart.findAll({ where: { UserId } });
+
+      const newOrder = await Order.create({
+        UserId,
+        transactionId: transaction_id,
+        orderId: order_id,
+        grossAmount: gross_amount,
+        paymentType: payment_type,
+        transactionStatus: transaction_status,
+        transactionTime: transaction_time,
       });
-      res.status(201).json(order);
+
+      // Then, create OrderCart entries for each item in the cart
+      for (let item of cartItems) {
+        // console.log("🚀 ~ Controller ~ createOrder ~ item:", item);
+        const product = await Product.findOne({
+          where: { id: item.ProductId },
+        });
+        if (product) {
+          // Create an entry in the OrderCart with price from the Product
+          await OrderCart.create({
+            OrderId: newOrder.id, // Reference the new order
+            ProductId: item.ProductId, // Reference the product
+            quantity: item.quantity, // Quantity of the product in the cart
+            price: product.price, // Price fetched from the Product model
+          });
+        } else {
+          console.log(`Product with ID ${item.ProductId} not found.`);
+        }
+      }
+      res.status(201).json(newOrder);
     } catch (error) {
+      console.log("🚀 ~ Controller ~ createOrder ~ error:", error);
       next(error);
     }
   }
@@ -288,29 +339,47 @@ module.exports = class Controller {
     }
   }
 
-  static async getOrderDetails(req, res, next) {
+  static async generateMidtransToken(req, res, next) {
+    const { totalAmount } = req.body;
     try {
-      const { id } = req.params;
-
-      // Fetch the specific order by ID
-      const order = await Order.findOne({
-        where: { id },
-        include: [
-          {
-            model: Product,
-            attributes: ["name", "price"], // Include the products in the order
-          },
-        ],
+      const findUser = await User.findByPk(req.user.id);
+      let snap = new midtransClient.Snap({
+        // Set to true if you want Production Environment (accept real transaction).
+        isProduction: false,
+        serverKey: process.env.MIDTRANS_SERVER_KEY,
       });
 
-      if (!order) {
-        return res.status(404).json({ message: "Order not found." });
-      }
+      let parameter = {
+        transaction_details: {
+          order_id: Math.floor(123456 + Math.random() * 99),
+          gross_amount: totalAmount,
+          //   gross_amount: 1000,
+        },
+        credit_card: {
+          secure: true,
+        },
+        customer_details: {
+          email: findUser.email,
+        },
+      };
+      const midtransToken = await snap.createTransaction(parameter);
+      res.status(201).json(midtransToken);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-      // Return specific order details
-      res.status(200).json({
-        data: order,
+  // Get all OrderCarts for a specific order
+  static async getOrderCarts(req, res, next) {
+    try {
+      const { orderId } = req.params;
+      console.log("🚀 ~ Controller ~ getOrderCarts ~ orderId:", orderId);
+      const orderCarts = await OrderCart.findAll({
+        where: { OrderId: orderId },
+        include: [Product], // Include Product details in the response
       });
+      console.log("🚀 ~ Controller ~ getOrderCarts ~ orderCarts:", orderCarts);
+      res.status(200).json(orderCarts);
     } catch (error) {
       next(error);
     }

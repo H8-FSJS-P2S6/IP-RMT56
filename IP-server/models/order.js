@@ -27,23 +27,29 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false, // UserId is required
       },
-      totalPrice: {
-        type: DataTypes.FLOAT,
-        allowNull: false, // Total price is required
-      },
-      orderStatus: {
-        type: DataTypes.ENUM("pending", "completed", "cancelled"), // Define possible statuses
-        allowNull: false,
-        defaultValue: "pending", // Default value for order status
-      },
-      paymentStatus: {
-        type: DataTypes.ENUM("unpaid", "paid", "failed"), // Define possible statuses
-        allowNull: false,
-        defaultValue: "unpaid", // Default value for payment status
-      },
-      paymentId: {
+      transactionId: {
         type: DataTypes.STRING,
-        allowNull: true, // Payment ID is optional
+        allowNull: false,
+      },
+      orderId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      grossAmount: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+      paymentType: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      transactionStatus: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      transactionTime: {
+        type: DataTypes.DATE,
+        allowNull: false,
       },
     },
     {

@@ -13,7 +13,6 @@ import { useState } from "react";
 
 export default function Cart({ product, onUpdate, onDelete }) {
   const [quantity, setQuantity] = useState(product.quantity);
-  console.log("🚀 ~ Cart ~ quantity:", quantity);
 
   // Handle increment
   const handleIncrement = () => {

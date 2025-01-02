@@ -6,7 +6,7 @@ const cors = require("cors"); // Import cors
 const app = express();
 
 app.use(cors());
-
+const midtransClient = require("midtrans-client");
 const router = require("./routers");
 
 app.use(express.urlencoded({ extended: false }));

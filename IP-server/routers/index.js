@@ -37,8 +37,11 @@ router.get("/faqs", Controller.getFAQsLogIn);
 
 // User-specific orders and cart management
 router.get("/orders", Controller.getOrders); // Fetch user orders
-router.get("/orders/:id", Controller.getOrderDetails); // Fetch specific order details
 router.post("/orders", Controller.createOrder); // Create a new order
+router.get("/orders/:orderId", Controller.getOrderCarts);
+
+// Midtrans
+router.post("/generate-midtrans-token", Controller.generateMidtransToken); // Create a new order
 
 function errorHandler(err, req, res, next) {
   console.log("🚀 ~ errorHandler ~ err:", err);

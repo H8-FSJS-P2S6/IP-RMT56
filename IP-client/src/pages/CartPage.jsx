@@ -20,6 +20,8 @@ export default function CartPage() {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user")); // Assuming the user is stored as an object
+  const userId = user?.id; // Safely access the user ID
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
@@ -28,7 +30,7 @@ export default function CartPage() {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           },
         });
-        console.log("🚀 ~ fetchCartItems ~ data:", data);
+        // console.log("🚀 ~ fetchCartItems ~ data:", data);
         setCartItems(data);
       } catch (err) {
         console.log("🚀 ~ fetchCartItems ~ err:", err);
@@ -100,8 +102,80 @@ export default function CartPage() {
     );
     setTotalPrice(total);
   }, [cartItems]);
+
+  const handlePay = async () => {
+    try {
+      const { data } = await baseURLApi.post(
+        "/generate-midtrans-token",
+        {
+          totalAmount: totalPrice,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      //   console.log("🚀 ~ handlePay ~ data:", data);
+
+      // Trigger snap popup. @TODO: Replace TRANSACTION_TOKEN_HERE with your transaction token
+      window.snap.pay(data.token, {
+        onSuccess: function (result) {
+          /* You may add your own implementation here */
+          toast.success("payment success!");
+          handleCreateOrder(result);
+        },
+        onPending: function (result) {
+          /* You may add your own implementation here */
+          alert("wating your payment!");
+          console.log(result);
+        },
+        onError: function (result) {
+          /* You may add your own implementation here */
+          alert("payment failed!");
+          console.log(result);
+        },
+        onClose: function () {
+          /* You may add your own implementation here */
+          alert("you closed the popup without finishing the payment");
+        },
+      });
+    } catch (error) {
+      console.log("🚀 ~ handlePay ~ error:", error);
+      toast.error("Failed to initialize payment");
+    }
+  };
+
+  const handleCreateOrder = async (transactionDetails) => {
+    console.log(
+      "🚀 ~ handleCreateOrder ~ transactionDetails:",
+      transactionDetails
+    );
+    try {
+      const response = await baseURLApi.post(
+        "/orders",
+        { transactionDetails, UserId: userId },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      console.log("Order created successfully:", response.data);
+      toast.success("Order created successfully!");
+    } catch (error) {
+      console.error("Failed to create order:", error);
+      toast.error("Failed to create order!");
+    }
+  };
   return (
     <section className="h-100" style={{ backgroundColor: "#eee" }}>
+      {/* Snap Embed Container */}
+      <div
+        id="snap-container"
+        style={{ marginTop: "20px", paddingLeft: "200px" }}
+      ></div>
       <MDBContainer className="py-5 h-100">
         <MDBRow className="justify-content-center align-items-center h-100">
           <MDBCol md="10">
@@ -152,6 +226,9 @@ export default function CartPage() {
               currency: "IDR",
             })}
           </MDBTypography>
+        </MDBRow>
+        <MDBRow>
+          <button onClick={handlePay}> Pay</button>
         </MDBRow>
       </MDBContainer>
     </section>

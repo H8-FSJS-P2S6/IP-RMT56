@@ -16,6 +16,8 @@ import HomePage from "./pages/HomePage";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DetailProductPage from "./pages/DetailProductPage";
 import CartPage from "./pages/CartPage";
+import OrderPage from "./pages/OrderPage";
+import OrderDetailPage from "./pages/OrderDetailPage";
 
 function ProtectedRoutes({ children }) {
   const isAuthenticated = useAuth();
@@ -63,6 +65,8 @@ function App() {
             <Route path="/products" element={<HomePage />} />
             <Route path="/products/:id" element={<DetailProductPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/orders" element={<OrderPage />} />
+            <Route path="/orders/:orderId" element={<OrderDetailPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

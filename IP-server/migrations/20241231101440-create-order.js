@@ -18,23 +18,29 @@ module.exports = {
         },
         onDelete: "CASCADE", // Deletes orders if a user is deleted
       },
-      totalPrice: {
-        type: Sequelize.FLOAT,
-        allowNull: false, // Total price is required
-      },
-      orderStatus: {
-        type: Sequelize.ENUM("pending", "completed", "cancelled"), // Enum values for order status
-        allowNull: false,
-        defaultValue: "pending", // Default value if none is provided
-      },
-      paymentStatus: {
-        type: Sequelize.ENUM("unpaid", "paid", "failed"), // Enum values for payment status
-        allowNull: false,
-        defaultValue: "unpaid", // Default value if none is provided
-      },
-      paymentId: {
+      transactionId: {
         type: Sequelize.STRING,
-        allowNull: true, // Payment ID is optional: not every order may have a payment ID associated with it at the time of creation (pending orders, offline payments, payment failures, prepaid orders)
+        allowNull: false,
+      },
+      orderId: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      grossAmount: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      paymentType: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      transactionStatus: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      transactionTime: {
+        type: Sequelize.DATE,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
