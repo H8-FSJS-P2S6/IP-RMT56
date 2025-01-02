@@ -13,41 +13,8 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      image: {
+      url: {
         type: Sequelize.STRING
-      },
-      description: {
-        type: Sequelize.STRING
-      },
-      effect: {
-        type: Sequelize.STRING
-      },
-      primary_attribute: {
-        type: Sequelize.STRING
-      },
-      abilities: {
-        type: Sequelize.JSONB
-      },
-      height: {
-        type: Sequelize.INTEGER
-      },
-      weight: {
-        type: Sequelize.INTEGER
-      },
-      strength: {
-        type: Sequelize.INTEGER
-      },
-      agility: {
-        type: Sequelize.INTEGER
-      },
-      lore: {
-        type: Sequelize.TEXT
-      },
-      min_level: {
-        type: Sequelize.INTEGER
-      },
-      max_level: {
-        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

@@ -22,41 +22,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    image:{
+    url:{
       type: DataTypes.STRING,
-    },
-    description: {
-      type: DataTypes.STRING,
-    },
-    effect: {
-      type: DataTypes.STRING,
-    },
-    primary_attribute: {
-      type: DataTypes.STRING,
-    },
-    abilities: { 
-      type: DataTypes.JSONB,
-    },
-    height: {
-      type: DataTypes.INTEGER,
-    },
-    weight: {
-      type: DataTypes.INTEGER,
-    },
-    strength: {
-      type: DataTypes.INTEGER,
-    },
-    agility: {
-      type: DataTypes.INTEGER,
-    },
-    lore: {
-      type: DataTypes.TEXT,
-    },
-    min_level: {
-      type: DataTypes.INTEGER,
-    },
-    max_level: {
-      type: DataTypes.INTEGER,
     },
   }, {
     sequelize,
