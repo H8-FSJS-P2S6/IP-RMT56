@@ -4,6 +4,7 @@ import Card from "../components/Card";
 import { toast } from "react-toastify";
 import "../assets/styles/global.css";
 import { useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -15,6 +16,7 @@ export default function HomePage() {
   const [page, setPage] = useState(1);
   const [count, setCount] = useState(0);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchCategories = async () => {
