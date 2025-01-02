@@ -4,7 +4,6 @@ import TabsContainer from './TabsContainer';
 import { usePokemonModal } from '../../context/PokemonModalProvider';
 import * as Dialog from '@radix-ui/react-dialog';
 
-
 const Modal = () => {
     const { isModalOpen, closeModal, currentPokemon } = usePokemonModal();
 
@@ -13,7 +12,6 @@ const Modal = () => {
             open={ isModalOpen }
             onOpenChange={ (isOpen) => ! isOpen && closeModal() }
         >
-
         <Dialog.Portal>
           <Dialog.Overlay className='overlay' />
             
@@ -22,7 +20,6 @@ const Modal = () => {
             data-content={ currentPokemon?.name }
           >
             <IntroModal />
-              
             <TabsContainer />
           </Dialog.Content>
         </Dialog.Portal>

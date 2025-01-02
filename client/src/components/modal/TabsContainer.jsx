@@ -10,7 +10,6 @@ const TabsContainer = () => {
         { id: 'Stats', component: <Stats /> },
         { id: 'Evolution', component: <Evolution /> }
     ];
-
     const [currentTab, setCurrentTab] = useState(0);
 
     return (
