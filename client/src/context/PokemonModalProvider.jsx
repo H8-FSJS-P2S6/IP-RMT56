@@ -4,6 +4,7 @@ export const PokemonModalContext = createContext();
 export const usePokemonModal = () => {
     return useContext(PokemonModalContext);
 };
+
 export const PokemonModalProvider = ({ children }) => {
     const [modal, setModal] = useState({ isOpen: false, pokemon: null });
     const value = {
