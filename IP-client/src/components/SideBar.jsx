@@ -71,6 +71,19 @@ export default function SideBar() {
               View My Orders
             </NavLink>
           </li>
+          <li className="nav-item">
+            <NavLink
+              to="/chat"
+              className={({ isActive }) =>
+                `nav-link ${isActive ? "active" : ""}`
+              }
+            >
+              <span className="icon material-symbols-outlined me-2">
+                shopping_bag
+              </span>
+              Chat with us
+            </NavLink>
+          </li>
         </ul>
         <h6 className="sidebar-heading d-flex justify-content-left align-items-center px-3 mt-4 mb-1 text-muted text-uppercase"></h6>
         <ul className="nav flex-column mb-2">

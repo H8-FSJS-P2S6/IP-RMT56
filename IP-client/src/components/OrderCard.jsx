@@ -35,7 +35,7 @@ export default function OrderCard(order) {
   return (
     <div
       className="card card-stepper"
-      style={{ borderRadius: 16, width: "100vh" }}
+      style={{ borderRadius: 16, width: "100vh", marginBottom: "20px" }}
     >
       <div className="card-header p-4">
         <div className="d-flex justify-content-between align-items-start">
@@ -194,7 +194,7 @@ export default function OrderCard(order) {
         </div>
       </div>
 
-      <div className="card-footer p-4">
+      {/* <div className="card-footer p-4">
         <div className="d-flex justify-content-center">
           <div className="border-start h-100" />
           <h5 className="fw-normal mb-0">
@@ -209,7 +209,7 @@ export default function OrderCard(order) {
             </a>
           </h5>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

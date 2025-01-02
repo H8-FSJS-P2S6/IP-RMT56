@@ -127,17 +127,17 @@ export default function CartPage() {
         },
         onPending: function (result) {
           /* You may add your own implementation here */
-          alert("wating your payment!");
+          toast.error("wating your payment!");
           console.log(result);
         },
         onError: function (result) {
           /* You may add your own implementation here */
-          alert("payment failed!");
+          toast.error("payment failed!");
           console.log(result);
         },
         onClose: function () {
           /* You may add your own implementation here */
-          alert("you closed the popup without finishing the payment");
+          toast.error("you closed the popup without finishing the payment");
         },
       });
     } catch (error) {
@@ -161,12 +161,27 @@ export default function CartPage() {
           },
         }
       );
-
-      console.log("Order created successfully:", response.data);
       toast.success("Order created successfully!");
+      await clearCart();
+      navigate("/orders");
     } catch (error) {
       console.error("Failed to create order:", error);
       toast.error("Failed to create order!");
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      await baseURLApi.delete("/cart/clear", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+      setCartItems([]); // Clear local cart items
+      toast.success("Cart cleared successfully!");
+    } catch (err) {
+      console.error("Error clearing cart", err);
+      toast.error("Failed to clear cart");
     }
   };
   return (
@@ -227,9 +242,11 @@ export default function CartPage() {
             })}
           </MDBTypography>
         </MDBRow>
-        <MDBRow>
-          <button onClick={handlePay}> Pay</button>
-        </MDBRow>
+        {totalPrice > 0 && (
+          <MDBRow>
+            <button onClick={handlePay}>Pay</button>
+          </MDBRow>
+        )}
       </MDBContainer>
     </section>
   );

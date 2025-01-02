@@ -18,6 +18,7 @@ import DetailProductPage from "./pages/DetailProductPage";
 import CartPage from "./pages/CartPage";
 import OrderPage from "./pages/OrderPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
+import ChatbotPage from "./pages/ChatbotPage";
 
 function ProtectedRoutes({ children }) {
   const isAuthenticated = useAuth();
@@ -62,9 +63,11 @@ function App() {
             }
           >
             {/* below routes are protected */}
+            <Route index element={<HomePage />} />
             <Route path="/products" element={<HomePage />} />
             <Route path="/products/:id" element={<DetailProductPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/chat" element={<ChatbotPage />} />
             <Route path="/orders" element={<OrderPage />} />
             <Route path="/orders/:orderId" element={<OrderDetailPage />} />
           </Route>

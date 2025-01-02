@@ -35,8 +35,8 @@ export default function Cart({ product, onUpdate, onDelete }) {
   };
 
   // Handle trash button
-  const handleTrash = () => {
-    onDelete(product.id); // Delete the cart item
+  const handleTrash = (productId) => {
+    onDelete(productId); // Delete the cart item
   };
   // Calculate total price for the product
   const totalPrice = product.price * quantity;
@@ -115,7 +115,7 @@ export default function Cart({ product, onUpdate, onDelete }) {
             <button
               type="button"
               className="btn btn-outline-danger"
-              onClick={handleTrash}
+              onClick={() => handleTrash(product.id)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

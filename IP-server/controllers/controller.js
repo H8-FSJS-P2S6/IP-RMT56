@@ -1,6 +1,6 @@
 const { where } = require("sequelize");
 const { comparePassword } = require("../helpers/bycriptjs");
-const { signToken } = require("../helpers/jwt");
+const { signToken, verifyToken } = require("../helpers/jwt");
 const {
   Product,
   Category,
@@ -12,6 +12,11 @@ const {
 } = require("../models");
 const { Op } = require("sequelize");
 const midtransClient = require("midtrans-client");
+const axios = require("axios");
+const { OpenAI } = require("openai"); // Import OpenAI SDK
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // Store your OpenAI API key in environment variables
+});
 module.exports = class Controller {
   static async getProducts(req, res, next) {
     try {
@@ -256,6 +261,7 @@ module.exports = class Controller {
       });
       res.status(200).json(cart);
     } catch (error) {
+      console.log("🚀 ~ Controller ~ getCart ~ error:", error);
       next(error);
     }
   }
@@ -324,10 +330,12 @@ module.exports = class Controller {
 
   static async deleteCartItem(req, res, next) {
     try {
-      const { id } = req.params; // Cart ID
+      const { id } = req.params;
       const UserId = req.user.id; // User ID from middleware
 
-      const cartItem = await Cart.findOne({ where: { id, UserId } });
+      const cartItem = await Cart.findOne({
+        where: { id, UserId },
+      });
       if (!cartItem) {
         return res.status(404).json({ message: "Cart item not found" });
       }
@@ -336,6 +344,24 @@ module.exports = class Controller {
       res.status(200).json({ message: "Cart item deleted successfully" });
     } catch (error) {
       next(error);
+    }
+  }
+  static async clearCart(req, res, next) {
+    const userId = req.user.id; // Assuming you have a middleware to authenticate and get the user ID
+    console.log("🚀 ~ Controller ~ clearCart ~ userId:", userId);
+
+    try {
+      // Delete all items in the cart for the authenticated user
+      await Cart.destroy({
+        where: {
+          UserId: userId, // Only clear the cart for the current user
+        },
+      });
+
+      res.status(200).json({ message: "Cart cleared successfully" });
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+      res.status(500).json({ message: "Failed to clear cart" });
     }
   }
 
@@ -378,10 +404,145 @@ module.exports = class Controller {
         where: { OrderId: orderId },
         include: [Product], // Include Product details in the response
       });
-      console.log("🚀 ~ Controller ~ getOrderCarts ~ orderCarts:", orderCarts);
+      //   console.log("🚀 ~ Controller ~ getOrderCarts ~ orderCarts:", orderCarts);
       res.status(200).json(orderCarts);
     } catch (error) {
       next(error);
+    }
+  }
+
+  // Open AI Chatbot
+  static async chatbotAI(req, res, next) {
+    try {
+      const { message } = req.body;
+      const faqList = require("../data/faq.json");
+      // If the message is "FAQ," send buttons with FAQ questions
+      if (message.toLowerCase() === "faq") {
+        const faqButtons = faqList.map((faq, index) => ({
+          id: index + 1, // Unique ID for the button
+          question: faq.question,
+        }));
+
+        return res.json({
+          type: "buttons",
+          buttons: faqButtons,
+          //   response: "Here are some FAQs. Click a question to see the answer.",
+        });
+      }
+
+      // Handle when a button is clicked (message contains a button ID)
+      const buttonIdMatch = message.match(/^faq-button-(\d+)$/);
+      if (buttonIdMatch) {
+        const buttonId = parseInt(buttonIdMatch[1], 10) - 1; // Convert to 0-based index
+        if (faqList[buttonId]) {
+          return res.json({
+            response: `Answer: ${faqList[buttonId].answer}`,
+          });
+        } else {
+          return res.json({ response: "Invalid FAQ selection." });
+        }
+      }
+      if (!message || message.toLowerCase() === "hi") {
+        const greetingMessage = `Hello! How can I help you? You can send "FAQ" to see the list of FAQs. You can also query the sum of your order by sending "order sum #ID", where ID is your order number.`;
+        return res.json({ response: greetingMessage });
+      }
+      console.log("🚀 ~ Controller ~ chatbotAI ~ message:", message);
+      const token = req.headers.authorization?.split(" ")[1]; // Extract the token from 'Bearer <token>'
+
+      if (!token) {
+        return res.status(401).json({ error: "No token provided" });
+      }
+
+      // Verify the token (replace with your secret or use a library like dotenv for environment variables)
+      const decoded = verifyToken(token);
+      if (decoded) {
+        if (message.toLowerCase().includes("order sum")) {
+          const orderIdMatch = message.match(/#?(\d+)/); // Make the '#' optional
+
+          if (orderIdMatch) {
+            const orderId = orderIdMatch[1]; // Get the actual order ID from the regex match
+
+            // Fetch order details from your server/database
+            const orderDetailsResponse = await axios.get(
+              `http://localhost:3000/orders/${orderId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            const orderDetails = orderDetailsResponse.data;
+            console.log(
+              "🚀 ~ Controller ~ chatbotAI ~ orderDetails:",
+              orderDetails
+            );
+
+            // Calculate the total price
+            const totalPrice = orderDetails.reduce(
+              (acc, item) => acc + item.price * item.quantity,
+              0
+            );
+
+            // Formulate a response
+            const responseMessage =
+              `Order #${orderId} details: ${orderDetails.length} items purchased with total price ${totalPrice} IDR. ` +
+              orderDetails
+                .map((item) => {
+                  return `${item.Product.name} (${item.quantity} x ${item.price} IDR)`;
+                })
+                .join(" and ");
+
+            // Return the response back to the user
+            return res.json({ response: responseMessage });
+          }
+        } else if (!message.toLowerCase().includes("order sum")) {
+          console.log("masuk siniiiii");
+          function getMatchScore(str1, str2) {
+            const words1 = str1.toLowerCase().split(" ");
+            const words2 = str2.toLowerCase().split(" ");
+            let matchCount = 0;
+
+            words1.forEach((word1) => {
+              words2.forEach((word2) => {
+                if (word1.includes(word2) || word2.includes(word1)) {
+                  matchCount += 1;
+                }
+              });
+            });
+
+            // Use max length instead of total length for normalization
+            return matchCount / Math.max(words1.length, words2.length);
+          }
+
+          // Find the FAQ with the highest match score
+          const matchedFaq = faqList.reduce(
+            (bestMatch, currentFaq) => {
+              const score = getMatchScore(message, currentFaq.question);
+              console.log(`FAQ: "${currentFaq.question}" | Score: ${score}`); // Log score for debugging
+              if (score > bestMatch.score) {
+                return { faq: currentFaq, score };
+              }
+              return bestMatch;
+            },
+            { faq: null, score: 0 }
+          );
+
+          // If match score is above a threshold, respond with the matched FAQ answer
+          if (matchedFaq.score > 0.3) {
+            // Adjusted threshold
+            console.log(
+              `Matched FAQ: ${matchedFaq.faq.question} (Score: ${matchedFaq.score})`
+            );
+            return res.json({ response: matchedFaq.faq.answer });
+          }
+        }
+      }
+      return res.json({
+        response: "I'm sorry, I couldn't find an answer to your question. ",
+      });
+    } catch (error) {
+      console.log("🚀 ~ Controller ~ chatbotAI ~ error:", error);
+      res.status(500).json({ error: "Failed to communicate with AI" });
     }
   }
 };

@@ -1,35 +1,100 @@
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 export default function OrderDetailPage() {
   const { state } = useLocation();
-  const orderDetails = state ? state.orderDetails : null;
+  const navigate = useNavigate();
+
+  console.log("🚀 ~ OrderDetailPage ~ state:", state);
+
+  // Check if state or orderDetails exist to prevent crashes
+  const orderDetails = state?.orderDetails;
+
+  if (!orderDetails) {
+    return (
+      <div className="container text-center mt-5">
+        <h2>No order details available</h2>
+      </div>
+    );
+  }
+
+  // Calculate the total price
+  const totalPrice = orderDetails.reduce(
+    (sum, product) => sum + product.price * product.quantity,
+    0
+  );
 
   return (
-    <div>
-      <h1>Order Details</h1>
-      {orderDetails ? (
-        <div>
-          <p>Order ID: {orderDetails.orderId}</p>
-          <p>Transaction Status: {orderDetails.transactionStatus}</p>
-          <p>Payment Status: {orderDetails.paymentStatus}</p>
-
-          <h3>Products in Order:</h3>
-          <ul>
-            {orderDetails.products && orderDetails.products.length > 0 ? (
-              orderDetails.products.map((product, index) => (
-                <li key={index}>
-                  <p>Product Name: {product.productName}</p>
-                  <p>Price: ${product.productPrice}</p>
-                </li>
-              ))
-            ) : (
-              <p>No products found for this order.</p>
-            )}
-          </ul>
+    <div className="container mt-5">
+      <div className="card">
+        <div className="card-header bg-primary text-white text-center">
+          <h2>Order Details</h2>
         </div>
-      ) : (
-        <p>Loading order details...</p>
-      )}
+        <div className="card-body">
+          <p>
+            <strong>Order ID:</strong> {orderDetails[0].OrderId}
+          </p>
+          <h3 className="mt-4">Products in Order:</h3>
+
+          <table className="table table-bordered table-striped">
+            <thead className="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price (IDR)</th>
+                <th>Total (IDR)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orderDetails.map((product, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{product.Product.name}</td>
+                  <td>{product.quantity}</td>
+                  <td>
+                    {product.price.toLocaleString("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    })}
+                  </td>
+                  <td>
+                    {(product.price * product.quantity).toLocaleString(
+                      "id-ID",
+                      {
+                        style: "currency",
+                        currency: "IDR",
+                      }
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colSpan="4" className="text-end">
+                  <strong>Total Price:</strong>
+                </td>
+                <td>
+                  <strong>
+                    {totalPrice.toLocaleString("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                    })}
+                  </strong>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div className="card-footer text-center">
+          <button
+            className="btn btn-primary"
+            onClick={() => navigate("/orders")}
+          >
+            Back to Orders
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

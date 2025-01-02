@@ -1,7 +1,6 @@
 {
   "name": "ip-server",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "test": "jest",
@@ -14,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
@@ -21,7 +21,9 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "midtrans-client": "^1.4.2",
+    "openai": "^4.77.0",
     "pg": "^8.13.1",
+    "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.5"
   },
   "devDependencies": {
@@ -29,5 +31,9 @@
     "nodemon": "^3.1.9",
     "sequelize-cli": "^6.6.2",
     "supertest": "^7.0.0"
-  }
+  },
+  "bin": {
+    "ip-server": "bin/www.js"
+  },
+  "description": ""
 }

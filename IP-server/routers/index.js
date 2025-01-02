@@ -28,6 +28,7 @@ router.use(authentication);
 
 // CARTS
 router.get("/cart", Controller.getCart); // Get cart items
+router.delete("/cart/clear", Controller.clearCart); // Delete item from cart
 router.post("/cart/:id", Controller.addToCart); // Add item to cart
 router.put("/cart/:id", Controller.updateCart); // Update item in cart
 router.delete("/cart/:id", Controller.deleteCartItem); // Delete item from cart
@@ -42,6 +43,9 @@ router.get("/orders/:orderId", Controller.getOrderCarts);
 
 // Midtrans
 router.post("/generate-midtrans-token", Controller.generateMidtransToken); // Create a new order
+
+// OPEN AI
+router.post("/chat", Controller.chatbotAI); // Create a new order
 
 function errorHandler(err, req, res, next) {
   console.log("🚀 ~ errorHandler ~ err:", err);
