@@ -40,15 +40,6 @@ module.exports = {
       };
     });
 
-    let faqs = require("../data/faq.json");
-    faqs = faqs.map((el) => {
-      return {
-        ...el,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-    });
-
     let products = require("../data/product.json");
     products = products.map((el, i) => {
       const currentTimeDelayed = new Date(new Date().getTime() + i * 1000);
@@ -60,7 +51,6 @@ module.exports = {
     });
     await queryInterface.bulkInsert("Users", hashedData);
     await queryInterface.bulkInsert("Categories", categories);
-    await queryInterface.bulkInsert("FAQs", faqs);
     await queryInterface.bulkInsert("Products", products);
   },
 
@@ -73,7 +63,6 @@ module.exports = {
      */
     await queryInterface.bulkDelete("Users", null, {});
     await queryInterface.bulkDelete("Categories", null, {});
-    await queryInterface.bulkDelete("FAQs", null, {});
     await queryInterface.bulkDelete("Products", null, {});
   },
 };
