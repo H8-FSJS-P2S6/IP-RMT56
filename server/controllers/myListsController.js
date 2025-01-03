@@ -1,5 +1,5 @@
-const { myPokemon, pokemon } = require("../models");
-
+const { MyPokemon, pokemon } = require("../models");
+const axios = require("axios");
 class MyListController {
   static async createMyPokemon(req, res) {
     const { pokemonId } = req.body;
@@ -8,43 +8,44 @@ class MyListController {
     if (!pokemonId) {
       return res.status(400).json({ error: "Pokemon ID is required" });
     }
-
     try {
-      const pokemon = await pokemon.findByPk(pokemonId);
-      if (!pokemon) {
+      const { data } = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
+      if (!data) {
         return res.status(404).json({ error: "Pokemon not found" });
       }
-
-      const existingEntry = await myPokemon.findOne({
+      const existingEntry = await MyPokemon.findOne({
         where: { userId, pokemonId },
       });
 
       if (existingEntry) {
-        return res
-          .status(400)
-          .json({ error: "Pokemon already in your mine" });
+        return res.status(400).json({ error: "Pokemon is already in your collection" });
       }
-
-      const newEntry = await myPokemon.create({
+      const newEntry = await MyPokemon.create({
         userId,
         pokemonId,
       });
 
-      const createdEntry = await myPokemon.findOne({
+      const createdEntry = await MyPokemon.findOne({
         where: { id: newEntry.id },
         include: [
           {
-            model: pokemon,
-            as: "pokemons",
-            attributes: ["id", "name", "url"],
+            model: pokemon, 
+            as: "pokemon",
+            attributes: ["id", "name", "url"], 
           },
         ],
       });
-
-      res.status(201).json(createdEntry);
+      return res.status(201).json(createdEntry);
     } catch (error) {
-      console.error("Error adding pokemon to myPokemon:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      console.error("Error adding pokemon to MyPokemon:", error);
+
+      if (error.response) {
+        return res.status(500).json({ error: `External API error: ${error.message}` });
+      } else if (error.request) {
+        return res.status(500).json({ error: "No response received from the external API" });
+      } else {
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
     }
   }
 
@@ -74,7 +75,7 @@ class MyListController {
       const { id } = req.params;
       const userId = req.user.id;
 
-      const myPokemon = await myPokemon.findOne({
+      const myPokemon = await MyPokemon.findOne({
         where: { id, userId },
         include: [
           {
@@ -112,7 +113,7 @@ class MyListController {
         return res.status(404).json({ error: "Pokemon not found" });
       }
 
-      const myPokemon = await myPokemon.findOne({
+      const myPokemon = await MyPokemon.findOne({
         where: { id, userId },
       });
 
@@ -122,19 +123,19 @@ class MyListController {
           .json({ error: "myPokemon not found or not owned by the user" });
       }
 
-      const existingEntry = await myPokemon.findOne({
-        where: { myPokemonId: id, pokemonId },
+      const existingEntry = await MyPokemon.findOne({
+        where: { MyPokemonId: id, pokemonId },
       });
 
       if (existingEntry) {
-        await myPokemon.destroy({
-          where: { myPokemonId: id, pokemonId },
+        await MyPokemon.destroy({
+          where: { MyPokemonId: id, pokemonId },
         });
       } else {
-        await myPokemon.create({ myPokemonId: id, pokemonId });
+        await MyPokemon.create({ MyPokemonId: id, pokemonId });
       }
 
-      const updatedMyPokemon = await myPokemon.findOne({
+      const updatedMyPokemon = await MyPokemon.findOne({
         where: { id },
         include: [
           {
@@ -157,14 +158,14 @@ class MyListController {
       const { id } = req.params;
       const userId = req.user.id;
 
-      const myPokemon = await myPokemon.findOne({ where: { id, userId } });
+      const myPokemon = await MyPokemon.findOne({ where: { id, userId } });
       if (!myPokemon) {
         return res
           .status(404)
           .json({ error: "MyPokemon not found or not owned by the user" });
       }
 
-      await myPokemon.destroy({ where: { id } });
+      await MyPokemon.destroy({ where: { id } });
 
       res.status(204).send();
     } catch (error) {

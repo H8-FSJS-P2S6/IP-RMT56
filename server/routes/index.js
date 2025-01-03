@@ -29,7 +29,6 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/google-login", googleLogin);
 
-router.get("/pokemons", getAllPokemons);
 router.use(authentication);
 router.post("/mypokemons", createMyPokemon);
 router.get("/mypokemons", getMyPokemons);

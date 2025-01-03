@@ -1,44 +1,33 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-require("dotenv").config();
+const axios = require('axios');
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;  
 
-// Fungsi untuk mendapatkan greeting berdasarkan waktu
-const getGreeting = () => {
-  const currentHour = new Date().getHours();
-  
-  if (currentHour >= 5 && currentHour < 12) {
-    return "Selamat pagi";
-  } else if (currentHour >= 12 && currentHour < 18) {
-    return "Selamat siang";
-  } else if (currentHour >= 18 && currentHour < 21) {
-    return "Selamat sore";
-  } else {
-    return "Selamat malam";
+async function gemini(prompt) {
+  if (!GEMINI_API_KEY) {
+    throw new Error("API key is missing.");
   }
-};
-
-const gemini = async (promptUser) => {
-  const googleAPIKey = process.env.GOOGLE_API_KEY;
-
-  const genAI = new GoogleGenerativeAI(googleAPIKey);
-
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-  // Menambahkan greeting sesuai waktu
-  const greeting = getGreeting();
-
-  const basePrompt = `${greeting}, `;
-  const prompt = promptUser ? `${basePrompt}${promptUser}` : `${basePrompt} Welcome to the world of Pokemon`;
-
   try {
-    const result = await model.generateContent(prompt);
+    const response = await axios.post(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', 
+      {
+        prompt: prompt
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${GEMINI_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-    const answer = await result.response.text();
-    return answer;
+    return response.data;  
   } catch (error) {
-    console.error("Error generating response:", error);
-    throw new Error("Error generating response.");
+    console.error("Error calling Gemini API:", error.message);
+    if (error.response && error.response.data && error.response.data.message.includes("API key not valid")) {
+      throw new Error("Invalid API Key. Please check your API configuration.");
+    }
+
+    throw new Error("Unknown error occurred while calling Gemini API.");
   }
-};
+}
 
 module.exports = gemini;
-
