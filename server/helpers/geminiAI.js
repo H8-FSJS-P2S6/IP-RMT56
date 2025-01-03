@@ -1,33 +1,28 @@
-const axios = require('axios');
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;  
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+require("dotenv").config();
 
-async function gemini(prompt) {
-  if (!GEMINI_API_KEY) {
-    throw new Error("API key is missing.");
-  }
+const gemini = async (promptUser) => {
+  const googleAPIKey = process.env.GOOGLE_API_KEY;
+
+  const genAI = new GoogleGenerativeAI(googleAPIKey);
+
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const basePrompt = "Welcome to the world of Pokemon";
+
+  const prompt = promptUser
+    ? `${basePrompt} ${promptUser}`
+    : `${basePrompt} all about pokemon`;
+
   try {
-    const response = await axios.post(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', 
-      {
-        prompt: prompt
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${GEMINI_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const result = await model.generateContent(prompt);
 
-    return response.data;  
+    const answer = await result.response.text();
+    return answer;
   } catch (error) {
-    console.error("Error calling Gemini API:", error.message);
-    if (error.response && error.response.data && error.response.data.message.includes("API key not valid")) {
-      throw new Error("Invalid API Key. Please check your API configuration.");
-    }
-
-    throw new Error("Unknown error occurred while calling Gemini API.");
+    console.error("Error generating welcome pokemon:", error);
+    throw new Error("Error generating welcome pokemon.");
   }
-}
+};
 
 module.exports = gemini;
