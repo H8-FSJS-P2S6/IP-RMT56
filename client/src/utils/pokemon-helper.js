@@ -1,5 +1,3 @@
-export const getTypeIconSrc = (type) => `./images/types-icons/${ type }.svg`;
-
 export const formatPokemonData = (pokemon) => {
     const { id, name, sprites, weight, height, types } = pokemon;
     
