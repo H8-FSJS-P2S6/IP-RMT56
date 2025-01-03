@@ -1,7 +1,6 @@
 const axios = require("axios");
 const pokemon = require("../models/pokemon");
 
-
 class pokemonController {
   static async getPokemons(req, res, next) {
     try {

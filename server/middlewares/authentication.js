@@ -18,6 +18,8 @@ const authentication = async (req, res, next) => {
     if (!user) {
       throw { name: "Unauthorized" };
     }
+    console.log(user);
+    
     req.user = {
       id: user.id,
     };

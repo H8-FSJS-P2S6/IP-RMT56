@@ -1,18 +1,14 @@
-const { MyPokemon, pokemon } = require("../models");
+const { MyPokemon, Pokemon } = require("../models");
 const axios = require("axios");
 class MyListController {
   static async createMyPokemon(req, res) {
     const { pokemonId } = req.body;
-    const userId = req.user.id;
-
+    const userId = 1;
+    
     if (!pokemonId) {
       return res.status(400).json({ error: "Pokemon ID is required" });
     }
     try {
-      const { data } = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
-      if (!data) {
-        return res.status(404).json({ error: "Pokemon not found" });
-      }
       const existingEntry = await MyPokemon.findOne({
         where: { userId, pokemonId },
       });
@@ -24,13 +20,14 @@ class MyListController {
         userId,
         pokemonId,
       });
+      
 
       const createdEntry = await MyPokemon.findOne({
         where: { id: newEntry.id },
         include: [
           {
             model: pokemon, 
-            as: "pokemon",
+            as: "pokemons",
             attributes: ["id", "name", "url"], 
           },
         ],

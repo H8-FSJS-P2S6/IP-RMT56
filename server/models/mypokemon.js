@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       // Many-to-One: MyListPokemon -> Pokemon
       MyPokemon.belongsTo(models.Pokemon, {
         foreignKey: "pokemonId",
-        as: "pokemon",
+        as: "pokemons",
       });
     }
   }
@@ -28,18 +28,10 @@ module.exports = (sequelize, DataTypes) => {
     {
     userId: {
       type: DataTypes.INTEGER,
-      references: {
-        model: "Users",
-        key: "id",
-      },
       allowNull: false,
     },
     pokemonId: {
       type: DataTypes.INTEGER,
-      references: {
-        model: "Pokemons",
-        key: "id",
-      },
       allowNull: false,
     },
   }, {
