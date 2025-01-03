@@ -3,6 +3,7 @@ import { baseURLApi } from "../helpers/http-client";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import uniqloLogo from "../../public/uniqloLogo.png";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("user1@mail.com");
@@ -27,6 +28,33 @@ export default function LoginPage() {
         error.response?.data?.error || "Failed to login. Please try again."
       );
     }
+  };
+
+  const handleGoogleLoginSuccess = async (response) => {
+    try {
+      const { credential } = response;
+      console.log("🚀 ~ handleGoogleLoginSuccess ~ credential:", credential);
+
+      // Send the Google token to the backend for verification
+      const result = await baseURLApi.post("/auth/google", {
+        token: credential,
+      });
+
+      localStorage.setItem("access_token", result.data.accessToken);
+      toast.success("Google Login successful!");
+      navigate("/products");
+    } catch (error) {
+      console.error("Google Login Error:", error);
+      toast.error(
+        error.response?.data?.error ||
+          "Failed to login with Google. Please try again."
+      );
+    }
+  };
+
+  const handleGoogleLoginFailure = (error) => {
+    console.error("Google Login Failure:", error);
+    toast.error("Google Login failed. Please try again.");
   };
   return (
     <>
@@ -97,6 +125,14 @@ export default function LoginPage() {
                       Log In
                     </button>
                   </form>
+                  <div className="mt-4">
+                    <h3>Or Login with Google</h3>
+                    <GoogleLogin
+                      onSuccess={handleGoogleLoginSuccess}
+                      onError={handleGoogleLoginFailure}
+                      useOneTap
+                    />
+                  </div>
                 </div>
               </div>
             </div>

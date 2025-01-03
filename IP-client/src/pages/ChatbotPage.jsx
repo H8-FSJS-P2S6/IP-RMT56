@@ -9,8 +9,10 @@ const ChatbotPage = () => {
   // Send the user's message and get a response
   const sendMessage = async (userMessage) => {
     try {
+      const apiURL = import.meta.env.VITE_API_URL;
+      console.log("🚀 ~ sendMessage ~ apiURL:", apiURL);
       const response = await axios.post(
-        "http://localhost:3000/chat", // Make sure the API endpoint is correct
+        `${apiURL}/chat`, // Make sure the API endpoint is correct
         { message: userMessage },
         {
           headers: {

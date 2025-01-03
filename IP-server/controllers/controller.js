@@ -17,6 +17,9 @@ const { OpenAI } = require("openai"); // Import OpenAI SDK
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // Store your OpenAI API key in environment variables
 });
+
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.CLIENT_ID_GOOGLE);
 module.exports = class Controller {
   static async getProducts(req, res, next) {
     try {
@@ -461,10 +464,10 @@ module.exports = class Controller {
 
           if (orderIdMatch) {
             const orderId = orderIdMatch[1]; // Get the actual order ID from the regex match
-
+            const orderAPI = process.env.ORDER_API_URL;
             // Fetch order details from your server/database
             const orderDetailsResponse = await axios.get(
-              `http://localhost:3000/orders/${orderId}`,
+              `${orderAPI}/${orderId}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -543,6 +546,39 @@ module.exports = class Controller {
     } catch (error) {
       console.log("🚀 ~ Controller ~ chatbotAI ~ error:", error);
       res.status(500).json({ error: "Failed to communicate with AI" });
+    }
+  }
+
+  static async googleLogin(req, res, next) {
+    try {
+      const { token } = req.body;
+      console.log("🚀 ~ Controller ~ googleLogin ~ token:", token);
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.CLIENT_ID_GOOGLE,
+      });
+      console.log("🚀 ~ Controller ~ googleLogin ~ ticket:", ticket);
+
+      const payload = ticket.getPayload();
+      console.log("🚀 ~ Controller ~ googleLogin ~ payload:", payload);
+      const { email } = payload;
+
+      let user = await User.findOne({ where: { email } });
+
+      // If the user doesn't exist, create a new user
+      if (!user) {
+        user = await User.create({
+          email,
+          password: (Math.floor(Math.random() * 999) + 123456).toString(),
+        });
+      }
+
+      const accessToken = signToken({ id: user.id });
+
+      res.status(200).json({ accessToken });
+    } catch (error) {
+      console.log("🚀 ~ Controller ~ googleLogin ~ error:", error);
+      res.status(500).json({ error: "Failed to login with Google Account" });
     }
   }
 };

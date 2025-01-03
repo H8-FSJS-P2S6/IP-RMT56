@@ -12,7 +12,9 @@ module.exports = async function authenthication(req, res, next) {
   }
   try {
     const data = verifyToken(token);
+    console.log("🚀 ~ authenthication ~ data:", data);
     const user = await User.findByPk(data.id);
+    console.log("🚀 ~ authenthication ~ user:", user);
     if (!user) {
       return next({ name: "Unauthorized", message: "User not found" });
     }

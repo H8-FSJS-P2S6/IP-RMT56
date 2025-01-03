@@ -17,6 +17,9 @@ router.get("/categories", Controller.getCategories);
 // login
 router.post("/login", Controller.login);
 
+// Google Login
+router.post("/auth/google", Controller.googleLogin);
+
 // register
 router.post("/register", Controller.register);
 
@@ -45,7 +48,7 @@ router.get("/orders/:orderId", Controller.getOrderCarts);
 router.post("/generate-midtrans-token", Controller.generateMidtransToken); // Create a new order
 
 // OPEN AI
-router.post("/chat", Controller.chatbotAI); // Create a new order
+router.post("/chat", Controller.chatbotAI);
 
 function errorHandler(err, req, res, next) {
   console.log("🚀 ~ errorHandler ~ err:", err);
