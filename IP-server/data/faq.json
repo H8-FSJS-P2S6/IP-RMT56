@@ -1,0 +1,22 @@
+[
+  {
+    "question": "What payment methods do you accept?",
+    "answer": "We accept credit cards payment through the Midtrans."
+  },
+  {
+    "question": "What is your return policy?",
+    "answer": "We offer a 7-day return policy."
+  },
+  {
+    "question": "Do you ship internationally?",
+    "answer": "No, we only ship in Indonesia."
+  },
+  {
+    "question": "How can I contact customer support?",
+    "answer": "Please reach out at support@ecommerce.com."
+  },
+  {
+    "question": "Are my payment details secure?",
+    "answer": "Yes, your payment details are securely processed using Midtrans gateway."
+  }
+]
