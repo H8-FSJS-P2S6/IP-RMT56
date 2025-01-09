@@ -8,7 +8,6 @@ const {
     googleLogin,
  } = require("../controllers/userController");
 const { 
-    getAllPokemons,
     getPokemons,
  } = require("../controllers/pokemonController");
 const {
