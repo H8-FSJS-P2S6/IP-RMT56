@@ -1,0 +1,20 @@
+[
+  {
+    "email": "user1@mail.com",
+    "password": "123456",
+    "name": "user 1",
+    "role": "Customer",
+    "phoneNumber": "08123456789",
+    "address": "Jl. Medan Merdeka no. 1, Jakarta",
+    "gender": "male"
+  },
+  {
+    "email": "user2@mail.com",
+    "password": "123456",
+    "name": "user 2",
+    "role": "Customer",
+    "phoneNumber": "08123456789",
+    "address": "Jl. Medan Merdeka no. 2, Jakarta",
+    "gender": "female"
+  }
+]
