@@ -1,0 +1,19 @@
+[
+    {
+      "name": "jon",
+      "email": "jon@mail.com",
+      "password": "12345", 
+      "price_range": "{\"min_price\":\"\",\"max_price\":\"\"}",
+      "brand": null,
+      "type": null
+    },
+    {
+      "name": "jen",
+      "email": "jen@mail.com",
+      "password": "12345", 
+      "price_range": "{\"min_price\":\"\",\"max_price\":\"\"}",
+      "brand": null,
+      "type": null
+    }
+  ]
+  
