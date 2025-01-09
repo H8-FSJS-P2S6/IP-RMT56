@@ -3,46 +3,45 @@ const axios = require("axios");
 class MyListController {
   static async createMyPokemon(req, res) {
     const { pokemonId } = req.body;
-    const userId = 1;
-    
+    const userId = req.user.id;
+  
     if (!pokemonId) {
       return res.status(400).json({ error: "Pokemon ID is required" });
     }
+  
     try {
+      const pokemon = await Pokemon.findByPk(pokemonId);  
+      if (!pokemon) {
+        return res.status(400).json({ error: "Pokemon does not exist" });
+      }
       const existingEntry = await MyPokemon.findOne({
         where: { userId, pokemonId },
       });
-
+  
       if (existingEntry) {
         return res.status(400).json({ error: "Pokemon is already in your collection" });
       }
+  
       const newEntry = await MyPokemon.create({
         userId,
         pokemonId,
       });
       
-
       const createdEntry = await MyPokemon.findOne({
         where: { id: newEntry.id },
         include: [
           {
-            model: pokemon, 
-            as: "pokemons",
-            attributes: ["id", "name", "url"], 
+            model: Pokemon,
+            as: "pokemon",
+            attributes: ["id", "name", "url"],
           },
         ],
       });
-      return res.status(201).json(createdEntry);
+  
+     res.status(201).json(createdEntry);
     } catch (error) {
-      console.error("Error adding pokemon to MyPokemon:", error);
-
-      if (error.response) {
-        return res.status(500).json({ error: `External API error: ${error.message}` });
-      } else if (error.request) {
-        return res.status(500).json({ error: "No response received from the external API" });
-      } else {
-        return res.status(500).json({ error: "Internal Server Error" });
-      }
+      console.error("Error creating myPokemon:", error);
+     res.status(500).json({ error: "Internal Server Error" });
     }
   }
 
@@ -50,12 +49,12 @@ class MyListController {
     try {
       const userId = req.user.id;
 
-      const pokemons = await pokemons.findAll({
+      const pokemons = await MyPokemon.findAll({
         where: { userId },
         include: [
           {
-            model: pokemon,
-            as: "pokemons",
+            model: Pokemon,
+            as: "pokemon",
             attributes: ["id", "name", "url"],
           },
         ],
@@ -76,8 +75,8 @@ class MyListController {
         where: { id, userId },
         include: [
           {
-            model: pokemon,
-            as: "pokemons",
+            model: Pokemon,
+            as: "pokemon",
             attributes: ["id", "name", "url"],
           },
         ],
@@ -105,7 +104,7 @@ class MyListController {
         return res.status(400).json({ error: "Pokemon ID is required" });
       }
 
-      const pokemon = await pokemon.findByPk(pokemonId);
+      const pokemon = await Pokemon.findByPk(pokemonId);
       if (!pokemon) {
         return res.status(404).json({ error: "Pokemon not found" });
       }
@@ -113,7 +112,8 @@ class MyListController {
       const myPokemon = await MyPokemon.findOne({
         where: { id, userId },
       });
-
+       console.log(id, userId, myPokemon);
+       
       if (!myPokemon) {
         return res
           .status(404)
@@ -121,23 +121,23 @@ class MyListController {
       }
 
       const existingEntry = await MyPokemon.findOne({
-        where: { MyPokemonId: id, pokemonId },
+        where: { id, pokemonId },
       });
 
       if (existingEntry) {
         await MyPokemon.destroy({
-          where: { MyPokemonId: id, pokemonId },
+          where: { id, pokemonId },
         });
       } else {
-        await MyPokemon.create({ MyPokemonId: id, pokemonId });
+        await MyPokemon.create({ id, pokemonId });
       }
 
       const updatedMyPokemon = await MyPokemon.findOne({
         where: { id },
         include: [
           {
-            model: pokemon,
-            as: "pokemons",
+            model: Pokemon,
+            as: "pokemon",
             attributes: ["id", "name", "url"],
           },
         ],

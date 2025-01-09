@@ -6,9 +6,9 @@ jest.mock("../helpers/geminiAI.js");
 
 describe("POST /gemini-ask", () => {
   test("Success 201: Should return AI generated response", async () => {
-    const mockResponse = "Welcome to the world of Pokemon.";
+    const mockResponse = "Welcome to the world of Pokémon!  What would you like to do?  Let's catch some Pokémon!\n";
     gemini.mockResolvedValue(mockResponse);
-    const prompt = "Welcome to the world of Pokemon";
+    const prompt = "hallo";
 
     const res = await request(app).post("/gemini-ask").send({
       promptUser: prompt,

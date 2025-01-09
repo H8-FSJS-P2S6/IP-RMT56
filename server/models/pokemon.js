@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Pokemon.hasMany(models.MyPokemon, {
         foreignKey: "pokemonId",
-        as: "pokemons",
+        as: "myPokemons",
       });
     }
   }
