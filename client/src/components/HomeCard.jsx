@@ -9,7 +9,7 @@ export default function HomeCard({ pokemon, onSelectPokemon, isDetail }) {
       <h3>{pokemon.name}</h3>
       {isDetail && (
         <>
-          <p>Url: {pokemon.image}</p>
+          <p>Url: {pokemon.url}</p>
           <p>ID: {pokemon.id}</p>
         </>
       )}

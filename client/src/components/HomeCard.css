@@ -26,14 +26,14 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.monster-image {
+.pokemon-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
 }
 
-.image-container:hover .monster-image {
+.image-container:hover .pokemon-image {
   transform: scale(1.1);
 }
 

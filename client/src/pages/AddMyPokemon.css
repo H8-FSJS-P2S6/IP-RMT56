@@ -1,0 +1,122 @@
+.add-pokemon-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.add-pokemon-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.pokemon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  justify-items: center;
+  margin-bottom: 30px;
+}
+
+.pokemon-card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 15px;
+  width: 100%;
+  max-width: 200px;
+}
+
+.pokemon-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.pokemon-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.pokemon-card button {
+  background-color: #646cff;
+  color: white;
+  padding: 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pokemon-card button:hover {
+  background-color: #535bf2;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.pagination button {
+  background-color: #f0f0f0;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.pagination button:hover {
+  background-color: #ddd;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  background-color: #e0e0e0;
+}
+
+.pagination span {
+  font-size: 1rem;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .add-pokemon-container {
+    padding: 15px;
+  }
+
+  .add-pokemon-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .pokemon-card {
+    max-width: 180px;
+  }
+
+  .pokemon-card img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .pokemon-card button {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+
+  .pagination button {
+    padding: 6px 12px;
+  }
+}

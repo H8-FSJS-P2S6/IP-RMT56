@@ -22,7 +22,7 @@ export default function Navbar() {
       <Button title="Ask-AI" onClick={() => navigate("/ask-ai")} />
       {accessToken ? (
         <>
-          <Button title="My Favorite" onClick={() => navigate("/myfavorite")} />
+          <Button title="Pokemon" onClick={() => navigate("/mypokemons")} />
           <Button title="Logout" onClick={handleLogout} />
         </>
       ) : (

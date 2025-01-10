@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import HomeCard from "../components/HomeCard";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
+import { fetchItems } from "../features/entitySlice";
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -16,14 +17,13 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("Fetching items...");
     dispatch(fetchItems(`/pub?page=${currentPage}&limit=${limit}`));
   }, [dispatch, currentPage, limit]);
 
-  // console.log();
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
-
       navigate(`/pub?page=${page}&limit=${limit}`);
     }
   };
@@ -32,16 +32,18 @@ export default function Home() {
     return <div>Loading...</div>;
   }
 
+  console.log("Pokemons:", pokemons); // Line 35
   const currentPagePokemons = pokemons.slice(
     (currentPage - 1) * limit,
     currentPage * limit
   );
+  console.log("Current Page Pokemons:", currentPagePokemons); // Line 40
 
   return (
     <div className="home-page">
       <h1>PokemonDeck</h1>
 
-      <div className="pokemons-grid">
+      <div className="pokemon-grid">
         {currentPagePokemons.map((pokemon) => (
           <HomeCard
             key={pokemon.id}

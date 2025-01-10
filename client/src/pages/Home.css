@@ -14,7 +14,7 @@ h1 {
   color: #333;
 }
 
-.monsters-grid {
+.pokemon-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
@@ -57,7 +57,7 @@ h1 {
   color: #333;
 }
 
-.monster-details-overlay {
+.pokemon-details-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -70,7 +70,7 @@ h1 {
   z-index: 1000;
 }
 
-.monster-details-modal {
+.pokemon-details-modal {
   background-color: white;
   padding: 20px;
   border-radius: 8px;
@@ -105,7 +105,7 @@ h1 {
     padding: 8px 16px;
   }
 
-  .monsters-grid {
+  .pokemon-grid {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 }
@@ -124,7 +124,7 @@ h1 {
     padding: 7px 14px;
   }
 
-  .monsters-grid {
+  .pokemon-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
 }

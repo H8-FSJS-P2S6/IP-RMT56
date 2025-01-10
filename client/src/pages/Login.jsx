@@ -42,12 +42,12 @@ export default function Login() {
   }
 
   useEffect(() => {
-    google.accounts.id.initialize({
+    googleLogin.accounts.id.initialize({
       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
       callback: handleCredentialResponse,
     });
 
-    google.accounts.id.renderButton(document.getElementById("google-login"), {
+    googleLogin.accounts.id.renderButton(document.getElementById("google-login"), {
       theme: "outline",
       size: "full",
       shape: "pill",
