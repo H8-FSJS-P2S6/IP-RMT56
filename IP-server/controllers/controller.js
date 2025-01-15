@@ -414,10 +414,27 @@ module.exports = class Controller {
     }
   }
 
+  // for server / openAI
+  static async fetchOrderCarts(orderId) {
+    try {
+      return await OrderCart.findAll({
+        where: { OrderId: orderId },
+        include: [Product],
+      });
+    } catch (error) {
+      throw error; // Let the caller handle errors
+    }
+  }
+
   // Open AI Chatbot
   static async chatbotAI(req, res, next) {
     try {
-      const { message } = req.body;
+      const { message } = req.body || {};
+      console.log("🚀 ~ Controller ~ chatbotAI ~ message:", message);
+      if (!message) {
+        const greetingMessage = `Hello! How can I help you? You can send "FAQ" to see the list of FAQs. You can also query the sum of your order by sending "order sum #ID", where ID is your order number.`;
+        return res.json({ response: greetingMessage });
+      }
       const faqList = require("../data/faq.json");
       // If the message is "FAQ," send buttons with FAQ questions
       if (message.toLowerCase() === "faq") {
@@ -445,10 +462,7 @@ module.exports = class Controller {
           return res.json({ response: "Invalid FAQ selection." });
         }
       }
-      if (!message || message.toLowerCase() === "hi") {
-        const greetingMessage = `Hello! How can I help you? You can send "FAQ" to see the list of FAQs. You can also query the sum of your order by sending "order sum #ID", where ID is your order number.`;
-        return res.json({ response: greetingMessage });
-      }
+
       console.log("🚀 ~ Controller ~ chatbotAI ~ message:", message);
       const token = req.headers.authorization?.split(" ")[1]; // Extract the token from 'Bearer <token>'
 
@@ -464,17 +478,9 @@ module.exports = class Controller {
 
           if (orderIdMatch) {
             const orderId = orderIdMatch[1]; // Get the actual order ID from the regex match
-            const orderAPI = process.env.ORDER_API_URL;
+            // const orderAPI = process.env.ORDER_API_URL;
             // Fetch order details from your server/database
-            const orderDetailsResponse = await axios.get(
-              `${orderAPI}/${orderId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            const orderDetails = orderDetailsResponse.data;
+            const orderDetails = await Controller.fetchOrderCarts(orderId);
             console.log(
               "🚀 ~ Controller ~ chatbotAI ~ orderDetails:",
               orderDetails
@@ -499,7 +505,7 @@ module.exports = class Controller {
             return res.json({ response: responseMessage });
           }
         } else if (!message.toLowerCase().includes("order sum")) {
-          console.log("masuk siniiiii");
+          // console.log("masuk siniiiii");
           function getMatchScore(str1, str2) {
             const words1 = str1.toLowerCase().split(" ");
             const words2 = str2.toLowerCase().split(" ");
@@ -541,7 +547,7 @@ module.exports = class Controller {
         }
       }
       return res.json({
-        response: "I'm sorry, I couldn't find an answer to your question. ",
+        response: "Sorry, I couldn't find an answer to your question. ",
       });
     } catch (error) {
       console.log("🚀 ~ Controller ~ chatbotAI ~ error:", error);
