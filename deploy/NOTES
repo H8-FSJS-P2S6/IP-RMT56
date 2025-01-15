@@ -1,0 +1,7 @@
+ls /etc/apache2/sites-available/
+cp -r ./deploy/* /etc/apache2/sites-available
+sudo a2ensite api.conf app.conf
+
+systemctl reload apache2
+
+sudo certbot --apache
