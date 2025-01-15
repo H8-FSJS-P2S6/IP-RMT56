@@ -1,6 +1,8 @@
 ls /etc/apache2/sites-available/
 cp -r ./deploy/* /etc/apache2/sites-available
 sudo a2ensite api.conf app.conf
+sudo a2enmod proxy
+sudo a2enmod proxy_http
 
 systemctl reload apache2
 
