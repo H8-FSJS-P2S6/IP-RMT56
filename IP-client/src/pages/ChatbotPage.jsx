@@ -13,7 +13,7 @@ const ChatbotPage = () => {
       console.log("🚀 ~ sendMessage ~ apiURL:", apiURL);
       const response = await axios.post(
         `${apiURL}/chat`, // Make sure the API endpoint is correct
-        { message: userMessage },
+        { message: "" },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`, // Ensure token is available
